@@ -20,24 +20,28 @@ package net.momirealms.customnameplates.bungeecord;
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
+import me.neznamy.tab.api.TabPlayer;
+import me.neznamy.tab.api.tablist.SortingManager;
 import me.neznamy.tab.shared.TAB;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PluginMessageEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
-import net.momirealms.customnameplates.objects.team.TABTeamHook;
 
 import java.util.Objects;
 
 public class BungeeEventListener implements Listener {
 
-    private final Main plugin;
+    private final CustomNameplates plugin;
+    private final SortingManager sortingManager;
 
-    public BungeeEventListener (Main plugin) {
+    public BungeeEventListener (CustomNameplates plugin) {
         this.plugin = plugin;
+        this.sortingManager = TAB.getInstance().getSortingManager();
     }
 
     @EventHandler
+    @SuppressWarnings("UnstableApiUsage")
     public void onReceived(PluginMessageEvent event) {
         String channel = event.getTag();
         if (event.isCancelled() || !Objects.equals("customnameplates:cnp", channel)) {
@@ -47,12 +51,14 @@ public class BungeeEventListener implements Listener {
         parseMessage(dataInput);
     }
 
+    @SuppressWarnings("UnstableApiUsage")
     private void parseMessage(ByteArrayDataInput dataInput) {
         String playerName = dataInput.readUTF();
         String teamName = playerName;
         if (plugin.getBungeeConfig().isTab()) {
-            teamName = TAB.getInstance().getPlayer(playerName).getTeamName();
-            teamName = teamName == null ? playerName : teamName;
+            TabPlayer tabPlayer = TAB.getInstance().getPlayer(playerName);
+            if (tabPlayer == null) return;
+            teamName = sortingManager.getOriginalTeamName(tabPlayer);
         }
         ProxiedPlayer proxiedPlayer = plugin.getProxy().getPlayer(playerName);
         ByteArrayDataOutput byteArrayDataOutput = ByteStreams.newDataOutput();

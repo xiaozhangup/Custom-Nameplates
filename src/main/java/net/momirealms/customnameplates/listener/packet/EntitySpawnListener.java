@@ -22,14 +22,14 @@ import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketEvent;
 import net.momirealms.customnameplates.CustomNameplates;
-import net.momirealms.customnameplates.objects.nameplates.mode.PacketsHandler;
+import net.momirealms.customnameplates.object.carrier.AbstractPacketsHandler;
 
 public class EntitySpawnListener extends PacketAdapter {
 
-    private final PacketsHandler handler;
+    private final AbstractPacketsHandler handler;
 
-    public EntitySpawnListener(PacketsHandler handler) {
-        super(CustomNameplates.plugin, ListenerPriority.HIGHEST, PacketType.Play.Server.NAMED_ENTITY_SPAWN);
+    public EntitySpawnListener(AbstractPacketsHandler handler) {
+        super(CustomNameplates.getInstance(), ListenerPriority.HIGHEST, PacketType.Play.Server.NAMED_ENTITY_SPAWN);
         this.handler = handler;
     }
 
